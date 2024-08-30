@@ -1,0 +1,63 @@
+# To perform downstream analysis, a conda environment is recommanded.
+ 
+# Step 1, the assemble could be 3 types.
+# 1.1: hifi only assemble
+# 1.2: assemble with parental short reads availiable
+# 1.3: Hi-C intergrated assemble
+
+# Step1.1 (this step is for hifi only assemble)
+# Assemble raw reads to contigs
+# Software used in this step named hifisam.
+# hifisam could be the best assembler nowadays. It can assemble a 30 Gbp genome in 3 days
+# Usually >=13x HiFi reads per haplotype is required for haplotype assemble
+# Details could be found in https://hifiasm.readthedocs.io/en/latest/index.html
+
+# Installation of hifisam
+git clone https://github.com/chhylp123/hifiasm
+cd hifiasm && make
+# For only hifi assemble
+hifiasm \
+-o output.asm \
+-t 32 input.fq.gz #\
+# Optional. This parameter is for get primiary contigs. the contigs is written to output.asm.p_ctg.gfa
+--primary #\ 
+# For inbred lines without many heterozygous sites, following parameter in needed
+# This is for closing bloom filter, the description of bloom filter can be found at: https://en.wikipedia.org/wiki/Bloom_filter
+-l0 #\
+# If the primary assemble is too large, followng parameters will help
+-s
+--hom-cov
+
+# Step1.2 (When parental short reads are availiable, this could help)
+# Installation is the same with step1.1
+
+# To do this, you may first need the use yak software for checking the k-mers
+# Installation of yak
+# Details could be found in the homepage of yak https://github.com/lh3/yak
+git clone https://github.com/lh3/yak
+cd yak && make
+# k-mer count by yak
+yak count -k31 -b37 -t16 -o mat.yak maternal.fq.gz
+yak count -k31 -b37 -t16 -o pat.yak paternal.fq.gz
+# This will generate two assembly, named output.hap1.p_ctg.gfa and output.hap2.p_ctg.gfa 
+hifiasm -o output.asm -t 32 -1 pat.yak -2 mat.yak NA12878.fq.gz
+# can generate both primary/alternate assemblies and trio binning assemblies with:
+hifiasm -o output.asm --primary -t 32 input.fq.gz 2> filename.asm.pri.log
+hifiasm -o output.asm -t 32 -1 pat.yak -2 mat.yak /dev/null 2> filename.asm.trio.log
+# The phasing switch error rate and hamming error rate are able to be evaluated quickly by yak
+yak trioeval -t16 pat.yak mat.yak assembly.fa
+
+# Step1.3
+# Hifiasm can generate a pair of haplotype-resolved assemblies with paired-end Hi-C reads:
+# + Hi-C
+hifiasm -o NA12878.asm -t32 --h1 read1.fq.gz --h2 read2.fq.gz HiFi-reads.fq.gz
+
+#Step1.4 
+# The hifisam can also use ONT (Oxford Nanopore Technologies) sequencing data for genome assemble.
+# only ONT
+hifiasm -o NA12878.asm -t32 --ul ul.fq.gz HiFi-reads.fq.gz
+# + Hi-C
+hifiasm -o NA12878.asm -t32 --ul ul.fq.gz --h1 read1.fq.gz --h2 read2.fq.gz HiFi-reads.fq.gz
+# + parental
+hifiasm -o NA12878.asm -t32 --ul ul.fq.gz -1 pat.yak -2 mat.yak HiFi-reads.fq.gz
+# Output of step1 could be seen https://hifiasm.readthedocs.io/en/latest/interpreting-output.html#interpreting-output
