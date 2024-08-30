@@ -1,0 +1,20 @@
+# Step2
+# As the output is gfa format which is not supported by RagTag(a sofeware maps contigs to reference genome to get right path) 
+# for get the fasta output
+awk '/^S/{print ">"$2; printf "%s", $3 | "fold -w 80"; close("fold -w 80"); print ""}' in.gfa > out.fa
+# If you want to include GFA tags in fasta header line
+awk '/^S/{header=">"$2; for(i=4; i<=NF; i++) {header=header" "$i}; print header; printf "%s", $3 | "fold -w 80"; close("fold -w 80"); print ""}' in.gfa > out.fa
+#close() is required to prevent the headers and sequences from getting out of sync or being skipped 
+#when sequences are very long.
+
+# Sometimes, one may need join contigs/segments together before exporting to fasta you should use a scaffolding tool such as:
+# # #GraphUnzip (Detangles graph, can be used before scaffolding)
+# # #DENTIST
+# # #SAMBA
+# # #ntLINK
+# # #SLR
+# # #SGTK
+#However these is not necessary when you already have a reference genome of the same speices.
+
+# A very good choice is too amplify a crossing population, especially in plants, construction of linkage maps will help you know the relative position of each contig
+#If karyotype is known, better using FISH-or GISH to verify it by karyotype. Then the Unknow chromosome will be assign into right chromosome.
