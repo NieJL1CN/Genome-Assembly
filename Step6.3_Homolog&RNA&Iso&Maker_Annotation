@@ -1,0 +1,31 @@
+#Step 6.3
+#Homolog annotation
+Sequence comparisons were performed using known genes from related species to find homologous sequences.
+On the basis of the homologous sequences, the gene structure was then predicted based on gene signals such as shear signals, start and stop codons.
+The proteins of homologous species were compared back to the genome using TBlastn to get the candidate regions.
+Accurate protein-nucleic acid matching using EXonerate to obtain splice sites.
+Sequence comparison was performed using known genes of homologous species to find homologous sequences.
+On the basis of the homologous sequences, gene structures were predicted based on gene signals such as shear signals, start and stop codons.
+The proteins of homologous species were compared back to the genome using TBlastn to get the candidate regions.
+Accurate protein-nucleic acid matching using EXonerate to obtain splice sites.
+
+RNA-seq assisted annotation
+tophat comparison ---->cufflink transcript ----> TransDecoder
+RNAseq data were subjected to tophat comparison.
+The resultant file is used to construct transcripts using cufflink.
+Use TransDecoder to predict Open Reading Frame (ORF) on the constructed transcripts.
+
+Iso seq auxiliary annotation
+CD-HIT ---->gmap comparison ---->TransDecoder
+De-redundancy of three generations of full-length transcripts of the species using CD-HIT.
+The redundant sequences were aligned back to the genome using gmap to obtain the transcript positions.
+Use TransDecoder to predict Open Reading Frame (ORF) on the constructed transcripts.
+
+MAKERE integration
+MAKER is a powerful process for genome annotation.
+MAKER is a powerful process that integrates Denovo, Homolog, and transcription-assisted annotation to ensure the reliability of the final annotated gene set.
+Ensure the reliability of the final annotated gene set
+maker maker_exe.ctl maker_opts.ctl maker_bopts.ctl
+#maker exe.ct: path to the executable program
+#maker_ boots.ctl: filter parameters for BLAST7 and Exonerate
+#maker opts.ctl: other information, e.g. input genome files, major adjustments to input files, etc. ( genome= ;est= ;protein= ;pred_gff= ;)
