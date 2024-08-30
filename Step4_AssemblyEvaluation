@@ -1,0 +1,39 @@
+# Step 4
+# After Ragtag, the chromosome scaled sequences were assembled.
+# Some evaluation of the assembly is needed.
+# Benchmarking Universal Single-Copy Orthologs (BUSCO) is good in evaluating
+# provides measures for quantitative assessment of genome assembly, gene set, and transcriptome completeness
+# https://busco.ezlab.org/
+
+# Installation
+conda create -n <your_env_name> -c conda-forge -c bioconda busco=5.7.1
+conda activate <your_env_name>
+# If conda takes a long time to solve the environment, 
+# you can try using mamba instead of conda. 
+# Mamba is a reimplementation of the conda package manager in C++.
+
+conda install -c conda-forge mamba
+mamba install -c conda-forge -c bioconda busco=5.7.1
+
+# Installation of BUSCO requires：
+# Python 3.3+ (2.7 is not supported from v4 onwards)
+# BioPython
+# Pandas
+# BBMap for genome assembly statistics such as N50
+# tBLASTn 2.2+ for eukaryotic genome and prokaryotic transcriptome modes
+# Augustus 3.2+ for eukaryotic genome mode
+# Metaeuk for eukaryotic genome and eukaryotic transcriptome modes
+# Prodigal for prokaryotic genome mode
+# HMMER3.1+ for all modes
+# SEPP for the auto-select lineage pipeline
+# R and ggplot2 for the plotting companion script
+
+# Running BUSCO
+busco \
+-i [SEQUENCE_FILE in fasta format] \
+-m [MODE: genome, proteins, transcriptome] \
+# [OTHER OPTIONS]
+-c \#CPU cores
+--auto-lineage \
+-o \
+--augustus #etc. detail could be seen in the webpage.
