@@ -1,0 +1,97 @@
+# Step 6
+# After the evaluation of assembly, doing annotation is a good practice.
+# Step 6.1
+# If there is already a reference genome, a software named Liftoff could help
+# https://github.com/agshumate/Liftoff
+# Installation. This software may need Minimap2, which is also needed in hifisam
+conda install -c bioconda liftoff
+
+# usage:
+usage: liftoff [-h] (-g GFF | -db DB) [-o FILE] [-u FILE] [-exclude_partial]
+               [-dir DIR] [-mm2_options =STR] [-a A] [-s S] [-d D] [-flank F]
+               [-V] [-p P] [-m PATH] [-f TYPES] [-infer_genes]
+               [-infer_transcripts] [-chroms TXT] [-unplaced TXT] [-copies]
+               [-sc SC] [-overlap O] [-mismatch M] [-gap_open GO]
+               [-gap_extend GE]
+               target reference
+# Lift features from one genome assembly to another
+# transcriptome-based, ab initio, homologous-protein-based prediction are also needed in annotating
+
+# Step 6.2
+# De novo prediction of annotation genes after masking of repetitive sequences and TEs
+# Step 6.2.1 
+# Software augustus
+# Installation
+sudo apt install augustus augustus-data augustus-doc
+# Usage
+augustus --species=XXX --AUGUSTUS CONFIG PATH= config --uniqueGeneld=true --nolnFrameStop=true--gff3=on --strand=both genome.mask.fa> genome.mask.fa.out
+# The use of augustus is based on machine learning so if requires training.
+# Use augustus --species=help to check if there is any training data availiable
+# For example, the Arabidopsis has the trained dataset, so the training could be easy:
+# I'm doing with wheat, and what is lucky that wheat is avaliable
+augustus --speices=wheat test.fa > test.gff 
+#If train by yourself,Possible sources of gene structure sets are.
+# # # a. Genbank
+# # # b. Variable shear ligation of EST/mRNA-seq, e.g. PASA
+# # # c. Variable shear ligation of proteins from neighboring species, e.g. GeneWise
+# # # d. Data from related species
+# # # e. Iterative training of predicted genes
+# if not, you should trian your self
+# you need get genebank file, there is a script avaliable  
+#https://github.com/chapmanb/bcbb/blob/master/gff/Scripts/gff/gff_to_genbank.py
+# Usage: 
+gff_to_genbank_edit.py <GFF annotation file> <FASTA sequence file>
+
+##### Training Process from here
+# 1. Format conversion; based on the GFF3 and ref.fa files of selected species into Genbank format.
+###### This is very slow. I'm finding the faster way to do it
+perl ~/miniconda2/bin/gff2gbSmallDNA.pl . /Spinach_genome/spinach_gene_v1.gff3 . /Spinach_genome/spinach_genome_v1.fa 1000 genes.raw.gff3# .
+# 2. Try training to catch errors;
+etraining --species=generic --stopCodonExcludedFromCDS=false genes.raw.gb 2> train.err
+# 3. Filter out possible errors in gene structure
+cat train.err | perl -pe 's/. *in sequence (\S+): . */$1/' >badgenes.lst
+filterGenes.pl badgenes.lst genes.raw.gb > genes.gb
+# 4. Extract the proteins in genes.db after the previous step (steps 4-6, which some people ignore)
+grep '/gene' genes.gb |sort |uniq |sed 's/\/gene=//g' |sed 's/\"//g‘ |awk ’{print $1}' >geneSet.lst
+python extract_pep.py geneSet.lst Spinach_genome/spinach_pep_v1.fa
+# 5. The obtained protein sequences will be constructed into a library and compared with blastp itself. According to the comparison result, if the inter-gene identity >= 70%, only one of them will be kept, and again get a filtered gff file, gene_filter.gff3
+makeblastdb -in geneSet.lst.fa -dbtype prot -parse_seqids -out geneSet.lst.fa
+blastp -db geneSet.lst.fa -query geneSet.lst.fa -out geneSet.lst.fa.blastp -evalue 1e-5 -outfmt 6 -num_threads 8
+python delete_high_identity_gene.py geneSet.lst.fa.blastp Spinach_genome/spinach_gene_v1.gff3
+# 6. Convert the obtained gene_filter.gff3 to a genbank format file
+perl ~/miniconda2/bin/gff2gbSmallDNA.pl gene_filter.gff3 . /Spinach_genome/spinach_genome_v1.fa 1000 genes.gb.filter
+# 7. The filtered file from the previous step is randomly divided into two, test set and training set. Where the number of training set is determined by the number of LOCUS in gb, at least 200
+## 100 is the number of genes in the test set, the rest is the training set
+randomSplit.pl genes.gb.filter 100
+# 8. Initialize the HMM parameter settings (form the parameters in the corresponding ~/minicode/config/species/relative name, if the species name already exists, it needs to be deleted), and perform training
+new_species.pl --species=spinach
+etraining --species=spinach genes.gb.filter.train
+# 9. Examine the predictions with a test dataset, where we can compare the results of our training with those of trained species in close proximity
+augustus --species=spinach genes.gb.filter.test | tee firsttest.out
+augustus --species=arabidopsis genes.gb.filter.test | tee firsttest_ara.out
+# 10. A very likely scenario is that our first training didn't work as well as the existing training, so we need to loop through the training to find the optimal parameters;
+# (This can be very time consuming to run, and the final result is usually only a few percentage points more accurate, so use with caution)
+optimize_augustus.pl --species=spinach genes.gb.filter.train
+# 11. train and test again, compare before and after
+etraining --species=spinach genes.gb.filter.train
+augustus --species=spinach genes.gb.filter.test | tee secondtest.out
+# If the sensitivity of your gene level is still below 20% at this point that means the Trainning set is not big enough, please add data;
+# If you get a satisfactory Trainning result, please start prediction.
+# 12. The following command can be used to extract amino acid sequences from firsttest.out
+sed -n '/^#/p' firsttest.out | sed -n '/start/,/\]/p' | sed 's/# start gene />/g;s/protein sequence \= \[//g;s/#//g;s//\]//g;s/^\s//g' >seq.fa
+#### End
+
+
+# Other software could also help in annotating
+# Step 6.2.2 
+# GlimmerHMM (eukaryotic, higher number of genes predicted, shorter length, generally used in plants)
+# Usage
+glimmerhmm.genome.mask.fa -d XXX- f -g genome.mask.fa.gff
+# -d Path to the library.
+# -f: don't partial gene predictions; # -g output format set to gff; # -g output format set to gff; # -g output format set to gff.
+# -g output format set to gff
+# Step 6.2.3 # This is for animals, so I will not use this for plants
+# Genscan (eukaryotic, which predicts larger introns, generally used in animals)
+# Usage
+genscan Humanlso.smat genome.mask.fa > genome.mask.fa.genscan
+# Humanlsc.smat: parameter file, comes with the software.
