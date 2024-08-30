@@ -1,9 +1,13 @@
 # Genome-Assembly
-This workflow is prepared for the assemble of PacBio HiFi long read sequences.
+This workflow is prepared for the assemble of PacBio HiFi long read sequences. The annotation and downstream analysis is also included.
+-
+Nie Jilu from lab. plant breeding, Kyoto University
 
 2024/08/30
 The step6.3 and Step7 is not well-done. I will continously update them
 The Analysis_files are not done yet
+The code has not been tested and integrated by 2024/08/30, the code after test will be in a file named **makefile.sh **
+
 
 All details could be seen in the files of each step
 
@@ -26,4 +30,6 @@ Then you may need homolog genomes and RNA-seq data to help with your annotating.
 
 An overview could be seen as following:
 ![Analysis](https://github.com/user-attachments/assets/9b599a27-a277-4831-b135-0d061342c1dc)
+Check the details in the file after step 4.
 
+Pan-genome analysis and downstream analysis is under releasing
