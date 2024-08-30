@@ -1,0 +1,7 @@
+# Functional Annotation
+# Functional annotation:The annotation of gene function depends on the prediction of gene structure in the previous step.
+# Based on the prediction results, the translated protein sequences are extracted from the genome and compared with the mainstream databases for blastp to complete the functional annotation.
+# # # GeneOntology database
+# # # KEGG, biological pathway database (Gene, Pathway, Ligand).
+# # # UniProt (Universal Protein Resource) protein sequence database.
+# # # Interpro database of protein families, domains and functional sites.
