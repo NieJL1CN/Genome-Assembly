@@ -12,5 +12,17 @@ A overview of the workflow of PacBio hifi long read assembly is as following:
 ![微信图片_20240830131136](https://github.com/user-attachments/assets/a7731e45-9c86-42f3-b1d1-05d45051ba8c)
 
 For achieving your purposes, a conda environment is requied.
-The 
+
+**To check details, please go to the files whose name are from step1 to step3**
+
+After assemble, you may need evaluation of your genome, please check step 4 for details
+Generally speaking, BUSCO is the software to do it
+
+The annotation is a little bit complex, including gene prediction by augustus and other software, a mechine learning program 
+would be needed if there is no training data for your speices.
+
+The annotation usually begin from the masking of TE and repeat, which will help you to save a lot of computating time
+Then you may need homolog genomes and RNA-seq data to help with your annotating.
+
+An overview could be seen as following:
 
