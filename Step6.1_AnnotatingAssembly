@@ -1,0 +1,19 @@
+# Step 6
+# After the evaluation of assembly, doing annotation is a good practice.
+# Step 6.1
+# If there is already a reference genome, a software named Liftoff could help
+# https://github.com/agshumate/Liftoff
+# Installation. This software may need Minimap2, which is also needed in hifisam
+conda install -c bioconda liftoff
+
+# usage:
+usage: liftoff [-h] (-g GFF | -db DB) [-o FILE] [-u FILE] [-exclude_partial]
+               [-dir DIR] [-mm2_options =STR] [-a A] [-s S] [-d D] [-flank F]
+               [-V] [-p P] [-m PATH] [-f TYPES] [-infer_genes]
+               [-infer_transcripts] [-chroms TXT] [-unplaced TXT] [-copies]
+               [-sc SC] [-overlap O] [-mismatch M] [-gap_open GO]
+               [-gap_extend GE]
+               target reference
+# Lift features from one genome assembly to another
+# transcriptome-based, ab initio, homologous-protein-based prediction are also needed in annotating
+
