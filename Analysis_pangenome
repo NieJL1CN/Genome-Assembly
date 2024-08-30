@@ -1,0 +1,26 @@
+# Step 7 
+# pan-genome analysis, this step is finding orthologues and draw Species Tree or Gene Trees
+# OrthoFinder with the Markov clustering algorithm
+# If you are interested in a single gene, SHOOT.bio is a choice: https://SHOOT.bio
+#All the steps below should be done in linux system. If you are using Mac or Windows,try conda or docker
+# Installation of OrhoFinder
+Download the latest release from github: https://github.com/davidemms/OrthoFinder/releases
+# Extract the files (If you have python installed and the numpy and scipy libraries )
+tar xzf OrthoFinder_source.tar.gz 
+# or (entire package)
+tar xzf OrthoFinder.tar.gz
+#Test of installation
+python OrthoFinder_source/orthofinder.py -h
+# or
+./OrthoFinder/orthofinder -h
+# Run example data, input files are at fasta format, with one file per species
+# For example A.fasta B.faste C.fasta in the folder named ExampleData/
+./OrthoFinder/orthofinder -f /OrthoFinder/ExampleData/
+# To check the trees, 
+# Dendroscope # software is a good choice
+# The tree is saved in Species_Tree/SpeciesTree_rooted.txt.
+# To root a tree, 
+# The root of a phylogenetic tree is usually determined by using the outgroup method; 
+# one or more of the species are assumed to fall outside of the species group of interest 
+# (de- noted the ingroup) and the branch where the outgroup connects to the ingroup 
+# becomes the root of the ingroup tree.
