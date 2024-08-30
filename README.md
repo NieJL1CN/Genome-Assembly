@@ -25,4 +25,5 @@ The annotation usually begin from the masking of TE and repeat, which will help 
 Then you may need homolog genomes and RNA-seq data to help with your annotating.
 
 An overview could be seen as following:
+![Analysis](https://github.com/user-attachments/assets/9b599a27-a277-4831-b135-0d061342c1dc)
 
