@@ -1,0 +1,7 @@
+# To perform downstream analysis, a conda environment is recommanded.
+
+# Step 0
+# Quality control of raw polymerase reads and generate HiFi reads
+# Package names: PacBio SMRT-Analysis (SMRTLink)
+# This would be processed by the company, however, it's good to cite this step in content.
+# Please check the website of SMRTLink
